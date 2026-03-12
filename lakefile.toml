@@ -1,0 +1,10 @@
+name = "u4_lean"
+version = "0.1.0"
+defaultTargets = ["u4_lean"]
+
+[[lean_lib]]
+name = "U4Lean"
+
+[[lean_exe]]
+name = "u4_lean"
+root = "Main"
