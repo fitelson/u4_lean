@@ -32,10 +32,7 @@ Every T_n has weight >= 15 (while *p* -> *p* has weight 3). The proof that no ot
 
 | File | Lines | Description |
 |------|-------|-------------|
-| `U4Lean/All.lean` | 440 | Self-contained single file (everything, no imports) |
-| `U4Lean/Basic.lean` | 193 | Term type, Y/R/T chain, unification, CD function |
-| `U4Lean/Theorem.lean` | 191 | subst_acyclic, occurs propagation, weight lemmas |
-| `U4Lean/Cascade.lean` | 237 | Cascade lemma + full proof of Theorem 5 |
+| `U4Lean.lean` | 440 | Complete proof: definitions, lemmas, and all cases |
 | `Main.lean` | 9 | Executable that prints chain and verification matrix |
 
 The proof uses **zero `sorry`** and has **no Mathlib dependency**.
