@@ -34,6 +34,8 @@ Every T_n has weight >= 15 (while *p* -> *p* has weight 3). The proof that no ot
 |------|-------|-------------|
 | `U4Lean.lean` | 440 | Complete proof: definitions, lemmas, and all cases |
 | `Main.lean` | 9 | Executable that prints chain and verification matrix |
+| `verify_u4.py` | 250 | Python verification: all CD pairs, occurs check |
+| `u4.in` | 3 | TPTP input for the u4 problem |
 
 The proof uses **zero `sorry`** and has **no Mathlib dependency**.
 
@@ -47,6 +49,6 @@ lake build
 
 ## References
 
-- B. Fitelson, "Resolving the Status of Ulrich's u4: A Condensed Detachment Analysis" (2026)
+- B. Fitelson, "The Shortest Single Axiom for Positive Implication" (2026)
 - B. Fitelson and N. Peltier, "Applying Saturation-Based Theorem Proving to Open Problems in Positive Implicational Logic", Journal of Automated Reasoning (to appear)
 - C. Meredith, "A single axiom of positive logic", The Journal of Computing Systems, 1(3), 1953, pp. 169-170
