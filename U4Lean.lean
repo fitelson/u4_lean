@@ -1,5 +1,6 @@
 /-
-  Formal verification of Theorem 5 from "Resolving the Status of Ulrich's u4"
+  Formal verification of Theorem 4.1 from
+  "Completing the Search for the Shortest Single Axiom for Positive Implication"
   by Branden Fitelson
 
   Single self-contained file: definitions, lemmas, and complete proof.
@@ -154,6 +155,18 @@ def Term.subst (σ : Nat → Term) : Term → Term
 theorem Term.weight_pos (t : Term) : t.weight ≥ 1 := by
   cases t <;> simp [weight] <;> omega
 
+/-- Substitution does not decrease the weight of a finite term. -/
+theorem weight_subst_ge_self (σ : Nat → Term) : ∀ t : Term,
+    (t.subst σ).weight ≥ t.weight
+  | var n => by
+      simp [Term.subst, Term.weight]
+      exact Term.weight_pos (σ n)
+  | imp l r => by
+      simp [Term.subst, Term.weight]
+      have hl := weight_subst_ge_self σ l
+      have hr := weight_subst_ge_self σ r
+      omega
+
 /-- If v occurs in t, then weight(t.subst σ) ≥ weight(σ v) -/
 theorem weight_subst_ge (σ : Nat → Term) (v : Nat) (t : Term)
     (h : t.occurs v = true) : (t.subst σ).weight ≥ (σ v).weight := by
@@ -227,7 +240,7 @@ theorem T_succ (n : Nat) : T (n + 1) =
 
 mutual
 theorem weight_YR_sum : ∀ n, (Y n).weight + (R n).weight ≥ 10
-  | 0 => by native_decide
+  | 0 => by decide
   | n + 1 => by
     simp [Y_succ, R_succ, weight]
     have := weight_YR_sum n; omega
@@ -235,7 +248,7 @@ end
 
 theorem weight_T_ge_15 : ∀ n, (T n).weight ≥ 15 := by
   intro n; cases n with
-  | zero => native_decide
+  | zero => decide
   | succ n =>
     simp [T_succ, weight]
     have := weight_YR_sum n; omega
@@ -246,6 +259,16 @@ theorem Cpp_not_in_chain (n : Nat) : T n ≠ imp (var 0) (var 0) := by
   have h15 := weight_T_ge_15 n
   rw [h] at h15; simp [weight] at h15
 
+/-- No substitution instance of a chain member is p → p. -/
+theorem Cpp_not_instance (n : Nat) (σ : Nat → Term) :
+    (T n).subst σ ≠ imp (var 0) (var 0) := by
+  intro h
+  have h15 := weight_T_ge_15 n
+  have hmono := weight_subst_ge_self σ (T n)
+  rw [h] at hmono
+  simp [weight] at hmono
+  omega
+
 /-! ## Variable 2 propagates through the entire chain -/
 
 mutual
@@ -253,7 +276,7 @@ theorem occurs2_Y : ∀ n, (Y n).occurs 2 = true
   | 0 => by rfl
   | n + 1 => by simp [Y_succ, occurs, occurs2_R n]
 theorem occurs2_R : ∀ n, (R n).occurs 2 = true
-  | 0 => by native_decide
+  | 0 => by decide
   | n + 1 => by simp [R_succ, occurs, occurs2_Y n]
 end
 
@@ -416,7 +439,7 @@ theorem caseC (n j : Nat) (K : Nat) :
 -- PART 9: MAIN THEOREM (all cases combined)
 -- ============================================================================
 
-/-- **Theorem 5 (Main Theorem)**: For all i ≥ 1, j ≥ 0, T_j and α_{i-1}
+/-- **Theorem 4.1 (Main Theorem)**: For all i ≥ 1, j ≥ 0, T_j and α_{i-1}
     are not unifiable (after shifting to disjoint variables).
     Therefore CD(T_i, T_j) is undefined for all i ≥ 1. -/
 theorem thm5_not_unifiable (i : Nat) (hi : i ≥ 1) (j : Nat) (K : Nat) :
@@ -433,10 +456,11 @@ theorem thm5_not_unifiable (i : Nat) (hi : i ≥ 1) (j : Nat) (K : Nat) :
     | zero => exact caseA i K
     | succ j => exact caseC i j K
 
-/-- **Corollary**: p → p is not derivable from u4 by condensed detachment.
-    Every T_n has weight ≥ 15, but p → p has weight 3. -/
-theorem Cpp_not_derivable (n : Nat) : T n ≠ imp (var 0) (var 0) :=
-  Cpp_not_in_chain n
+/-- **Corollary**: p → p is not a substitution instance of any chain member.
+    Every T_n has weight ≥ 15, and substitution does not decrease weight. -/
+theorem Cpp_not_derivable (n : Nat) (σ : Nat → Term) :
+    (T n).subst σ ≠ imp (var 0) (var 0) :=
+  Cpp_not_instance n σ
 
 /-! ## Utility for Main.lean executable -/
 
